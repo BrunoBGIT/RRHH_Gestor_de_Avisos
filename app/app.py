@@ -13,8 +13,10 @@ app.config['MYSQL_DB']='rrhh_avisos'
 def principal():
     return render_template('index.html')
 
-    
 
+@app.route('/Formulario_Aviso')
+def solicitudes():
+    return render_template('Formulario_Aviso.html')
 
 if __name__=='__main__':
     app.run(debug=True, port=5000)
