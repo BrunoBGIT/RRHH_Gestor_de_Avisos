@@ -5,26 +5,23 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestor de Avisos - Carga de Aviso</title>
-    <link rel="stylesheet" href="normalize.css">
-    <link rel="stylesheet" href="estilo.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/normalize.css')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/estilo.css')}}">
 </head>
 <body>
     <header>
     <h1>Registro de Avisos</h1>
     </header>
-    <section class="busqueda">
-        <form action="">
-            <div class="field1">
-                <input type="number" name="legajo_form" required placeholder="Ingrese Legajo" class="legajo">
-                <input type="submit" name="carga_datos_legajo" value="Buscar" >
-                <input type="text" name="nombre" disabled class="dato">
-                <input type="text" name="ubicacion" disabled class="dato">
-            </div>
-        </form>
+    <section class="datos_persona">
+        <h3>Legajo: {{ persona[0]  }}</h3>
+        <h3>Nombre: {{ persona[1]  }}</h3>
+        <h3>Sector: {{ persona[2]  }}</h3>
+        <br>
     </section>
+
     <section class="carga">
        
-            <form action="">
+            <form action="/aviso_cargado_exitosamente" method="post">
                 <div class="field3">
                     <label for="">Fecha evento</label>
                     <input type="date" name="dia_evento" required>
