@@ -86,9 +86,97 @@ def carga_aviso():
         return render_template('aviso_cargado_exitosamente.html')
 
 
+# ------------- FORMULARIO_PERSONAL --------------
+    # --------------- CARGAR NUEVO LEGAJO EN NOMINA ----------
+
+@app.route('/Formulario_Cargar_en_Nomina', methods=['POST']) #TRAE LOS DATOS DEL LEGAJO E IMPRIME
+def datos_para_insertar_leg():
+    if request.method=='POST':
+            legajo=request.form['legajo_form']
+            nombre=request.form['nombre_form']
+            ubicacion=request.form['ubic_form']
+       
+            cursor=conexion.connection.cursor()
+            
+            cursor.execute("SELECT * FROM nomina WHERE legajo=%s", (legajo,))
+            persona_evento=cursor.fetchone()
+            if persona_evento is None:
+                cursor.execute("INSERT INTO nomina (legajo, nombre, ubicacion) VALUES (%s, %s, %s)", (legajo,nombre,ubicacion))
+                conexion.connection.commit()
+                return render_template('aviso_cargado_exitosamente.html')
+            else:
+                return render_template('Error_Legajo_Existe.html')
+
+     # --------------- CONSULTAR EN NOMINA ----------
+
+@app.route('/Formulario_Listar_Nomina', methods=['POST']) #TRAE LOS DATOS PARA FILTRAR Y LUEGO LISTAR LA NOMINA
+def datos_para_listar_leg():
+    if request.method=='POST':
+            legajo=request.form['legajo_form']
+            nombre=request.form['nombre_form']
+            
+            if legajo=="":
+                if nombre=="":
+                    cursor=conexion.connection.cursor()
+                    cursor.execute("SELECT * FROM nomina ORDER BY nombre ASC") # -- FUNCIONA OK
+                    reporte_nomina=cursor.fetchall()
+                else:
+                    cursor=conexion.connection.cursor()
+                    nombre2=('%'+nombre+'%')
+                    cursor.execute("SELECT * FROM nomina WHERE nombre LIKE %s", (nombre2,)) # FUNCIONA SI NOMBRE==NOMBRE
+                    #cursor.execute("SELECT * FROM nomina WHERE nombre LIKE '%JUAN%'")
+                    reporte_nomina=cursor.fetchall()
+            else:
+                if nombre=="":
+                        cursor=conexion.connection.cursor()
+                        cursor.execute("SELECT * FROM nomina WHERE legajo=%s", (legajo,)) # -- FUNCIONA OK
+                        reporte_nomina=cursor.fetchall()
+                else:
+                    cursor=conexion.connection.cursor()
+                    cursor.execute("SELECT * FROM nomina WHERE (nombre=%s OR legajo=%s)", (nombre,legajo))  # -- FUNCIONA OK
+                    reporte_nomina=cursor.fetchall()
+    
+    return render_template('Muestra_Nomina.html', nomina=reporte_nomina)
+
+    # ----------- EDITAR UN LEGAJO ------------
+
+@app.route('/Formulario_Editar_Legajo', methods=['POST']) #TRAE LOS DATOS PARA EDITAR EL LEGAJO
+def datos_para_editar():
+    if request.method=='POST':
+            legajo=request.form['legajo_form']
+            cursor=conexion.connection.cursor()
+            cursor.execute("SELECT * FROM nomina WHERE legajo=%s", (legajo,))
+            persona_a_editar=cursor.fetchone()
+            #print(persona_a_editar)
+
+            if persona_a_editar is None:
+                return render_template('legajo_no_encontrado.html')
+            else:
+                global legajo2
+                legajo2=persona_a_editar[0]
+                nombre=persona_a_editar[1]
+                sector=persona_a_editar[2]
+                return render_template('Formulario_Editar.html', legajo=legajo2, nombre=nombre, sector=sector)
+                
+@app.route('/Registrar_Editar_Legajo', methods=['POST']) #TRAE LOS DATOS EDITADOS PARA ACTUALIZAR
+def datos_editados():
+    if request.method=='POST':           
+        
+        nombre=request.form['nombre_form']
+        ubic=request.form['ubic_form']
+        print(legajo2)
+        cursor=conexion.connection.cursor()
+        cursor.execute("UPDATE nomina SET nombre=%s, ubicacion=%s WHERE legajo=%s", (nombre,ubic, legajo2))
+        conexion.connection.commit()
+        return render_template('aviso_cargado_exitosamente.html')
+
 @app.route('/Formulario_Reporte') #PERMITE INGRESAR DATOS PARA PERSONALIZAR EL FILTRO
 def formulario_reporte():
     return render_template('Formulario_Filtro_Reporte.html')
+
+@app.route('/Formulario_Personal') #PERMITE CONSULTAR-ACTUALIZAR LA NOMINA
+def formulario_personal():
+    return render_template('Formulario_Personal.html')
 
 
 @app.route('/Reporte', methods=['POST']) #PERMITE INGRESAR DATOS PARA PERSONALIZAR EL FILTRO
