@@ -16,16 +16,24 @@
 
         <div class="row">
             <div class="col-sm-12 col-md-4 col-lg-4 col-lg-4 px-6 py-4 mx-auto bg-white">
-                <h2>Buscar legajo</h2>
-                <form action="/Formulario_Carga_Aviso" method="post">
+                <h2>Editar</h2>
+                <form action="/Registrar_Editar_Legajo" method="post">
                     <div class="mb-3">
                         <label for="Legajo" class="form-label">Legajo</label>
-                        <input type="text" class="form-control" name="legajo_form" required id="Legajo">
+                        <input type="text" class="form-control" name="lega_form" id="Legajo" disabled value="{{ legajo }}">
                       </div>
                     
-                                      
+                    <div class="mb-3">
+                        <label for="Nombre" class="form-label">Apellido y Nombre</label>
+                        <input type="text" class="form-control" name="nombre_form" id="Nombre" value="{{ nombre }}">
+                      </div>
+                    <div class="mb-3">
+                        <label for="Ubicacion" class="form-label">Ubicacion</label>
+                        <input type="text" class="form-control" name="ubic_form" id="Ubicacion" value="{{ sector }}">
+                      </div>
+                    
                     <div class="d-grid gap-2">
-                    <button class="btn btn-success" >Consultar</button>
+                    <button class="btn btn-success" >Guardar</button>
                     </div>  
                 </form>
                 

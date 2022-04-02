@@ -86,6 +86,53 @@ def carga_aviso():
         return render_template('aviso_cargado_exitosamente.html')
 
 
+@app.route('/Formulario_Colectivo') #CONSULTA COLECTIVO
+def colectivos():
+    return render_template('Formulario_Colectivo.html')
+
+
+@app.route('/aviso_colectivo_cargado_exitosamente', methods=['POST']) #REGISTRA AVISO COLECTIVO EN BD
+def carga_aviso_colectivo():
+   
+        if request.method=='POST': 
+            dia_evento= request.form['fecha']
+            linea= request.form['linea']
+            entrada_salida= request.form['entrada_salida']
+            horario_evento= request.form['horario']
+            
+            cursor=conexion.connection.cursor()
+            cursor.execute("INSERT INTO colectivos (dia, linea, entra_sale, hora) VALUES (%s, %s, %s,%s)", (dia_evento,linea,entrada_salida,horario_evento))
+            conexion.connection.commit()
+
+        return render_template('aviso_cargado_exitosamente.html')
+
+# consultar registros de colectivo
+
+@app.route('/Formulario_Listar_Colectivos', methods=['POST']) #TRAE LOS DATOS DEL COLECTIVO E IMPRIME
+def muestra_reg_colectivos():
+    if request.method=='POST':
+            linea2=request.form['linea2']
+            fecha2=request.form['fecha2']
+                   
+            if linea2=="":
+                if fecha2=="":
+                    cursor=conexion.connection.cursor()
+                    #cursor.execute("SELECT * FROM colectivos ORDER BY dia ASC") 
+                    cursor.execute("SELECT reg, date_format(dia,'%d-%m-%Y'), linea, entra_sale, hora FROM colectivos ORDER BY dia ASC")
+                    reporte_bondi=cursor.fetchall()
+                else:
+                    cursor=conexion.connection.cursor()
+                    cursor.execute("SELECT reg, date_format(dia,'%%d-%%m-%%Y'), linea, entra_sale, hora FROM colectivos WHERE dia = %s", (fecha2,))
+                    reporte_bondi=cursor.fetchall()
+            else:
+                cursor=conexion.connection.cursor()
+                bondi2=('%'+linea2+'%')
+                #cursor.execute("SELECT * FROM colectivos WHERE linea LIKE %s", (bondi2,)) 
+                cursor.execute("SELECT reg, date_format(dia,'%%d-%%m-%%Y'), linea, entra_sale, hora FROM colectivos WHERE linea like %s", (bondi2,))
+                reporte_bondi=cursor.fetchall()
+    return render_template('Reporte_avisos_colectivos.html', eventos=reporte_bondi)
+          
+
 # ------------- FORMULARIO_PERSONAL --------------
     # --------------- CARGAR NUEVO LEGAJO EN NOMINA ----------
 
@@ -123,7 +170,7 @@ def datos_para_listar_leg():
                 else:
                     cursor=conexion.connection.cursor()
                     nombre2=('%'+nombre+'%')
-                    cursor.execute("SELECT * FROM nomina WHERE nombre LIKE %s", (nombre2,)) # FUNCIONA SI NOMBRE==NOMBRE
+                    cursor.execute("SELECT * FROM nomina WHERE nombre LIKE %s ORDER BY nombre ASC", (nombre2,)) # FUNCIONA SI NOMBRE==NOMBRE
                     #cursor.execute("SELECT * FROM nomina WHERE nombre LIKE '%JUAN%'")
                     reporte_nomina=cursor.fetchall()
             else:
@@ -156,7 +203,7 @@ def datos_para_editar():
                 legajo2=persona_a_editar[0]
                 nombre=persona_a_editar[1]
                 sector=persona_a_editar[2]
-                return render_template('Formulario_Editar.html', legajo=legajo2, nombre=nombre, sector=sector)
+                return render_template('Formulario_Editar.html', legajo=legajo2,nombre=nombre, sector=sector)
                 
 @app.route('/Registrar_Editar_Legajo', methods=['POST']) #TRAE LOS DATOS EDITADOS PARA ACTUALIZAR
 def datos_editados():
